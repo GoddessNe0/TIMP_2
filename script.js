@@ -66,7 +66,6 @@ for (let i = 1; i <= 10; i++) {
 
 
 
-// Функция для выбора случайной стратегии
 function getRandomStrategy() {
   const strategies = [new Apartment(), new Townhouse(), new Cottage()];
   const randomIndex = Math.floor(Math.random() * strategies.length);
