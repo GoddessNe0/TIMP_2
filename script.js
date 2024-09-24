@@ -1,4 +1,3 @@
-// Импортируем классы
 class InsuranceType {
   calculate(squareMeters, yearBuilt, term) {}
 }
@@ -41,7 +40,6 @@ class InsuranceCalculator {
   }
 }
 
-
 for (let i = 1; i <= 10; i++) {
   const squareMeters = Math.floor(Math.random() * (300 - 15 + 1)) + 15;
   const yearBuilt = Math.floor(Math.random() * (2023 - 1900 + 1)) + 1900;
@@ -53,18 +51,6 @@ for (let i = 1; i <= 10; i++) {
   const insuranceCost = calculator.calculateInsurance(squareMeters, yearBuilt, term);
   console.log(`Вызов ${i}: Недвижимость: ${strategy.constructor.name} Площадь: ${squareMeters}, Год постройки: ${yearBuilt}, Срок: ${term} = ${insuranceCost}`);
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 function getRandomStrategy() {
   const strategies = [new Apartment(), new Townhouse(), new Cottage()];
