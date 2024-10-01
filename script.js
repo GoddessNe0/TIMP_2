@@ -1,59 +1,98 @@
-class InsuranceType {
-  calculate(squareMeters, yearBuilt, term) {}
-}
+// Базовый класс недвижимости
+// [1] Создание объектов недвижимости
+class Property {
+  constructor(area, residents, yearBuilt) {
+    this.area = area; // Жилая площадь (м²)
+    this.residents = residents; // Число проживающих
+    this.yearBuilt = yearBuilt; // Год постройки
+  }
 
-class Apartment extends InsuranceType {
-  calculate(squareMeters, yearBuilt, term) {
-    const baseRate = 5.0;
-    const ageFactor = Math.max(1.0, (2024 - yearBuilt) / 100);
-    return squareMeters * baseRate * ageFactor * term;
+  // Метод для расчета базовой стоимости
+  // [2] Расчёт базовой стоимости
+  getBasePremium() {
+    let baseRate = 50; // Базовая ставка на м²
+    let depreciationFactor = this.calculateDepreciation(); // [3]
+    return this.area * baseRate * depreciationFactor;
+  }
+
+  // Расчет коэффициента износа в зависимости от года постройки
+  // [4]
+  calculateDepreciation() {
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - this.yearBuilt;
+    if (age < 10) {
+      return 1.0; // Здание новое, без износа
+    } else if (age < 30) {
+      return 0.9; // Небольшой износ
+    } else if (age < 50) {
+      return 0.7; // Значительный износ
+    } else {
+      return 0.5; // Сильно изношено
+    }
+  }
+
+  // Метод для расчета коэффициента по числу проживающих
+  // [5]
+  calculateResidentFactor() {
+    if (this.residents <= 2) {
+      return 1.0;
+    } else if (this.residents <= 4) {
+      return 1.2;
+    } else {
+      return 1.5;
+    }
+  }
+
+  // Финальный расчет страхового взноса
+  calculatePremium(insurancePeriod) { // [6]
+    let basePremium = this.getBasePremium(); //[2]
+    let residentFactor = this.calculateResidentFactor(); // [5]
+    let periodFactor = this.getPeriodFactor(insurancePeriod); // [7]
+
+    return basePremium * residentFactor * periodFactor;
+  }
+
+  // Коэффициент по сроку страхования
+  getPeriodFactor(insurancePeriod) { // [7]
+    if (insurancePeriod < 1) {
+      return 1.1; // Краткосрочное страхование
+    } else if (insurancePeriod <= 3) {
+      return 1.0; // Средний срок
+    } else {
+      return 0.9; // Долгосрочное страхование
+    }
   }
 }
 
-class Townhouse extends InsuranceType {
-  calculate(squareMeters, yearBuilt, term) {
-    const baseRate = 7.0;
-    const ageFactor = Math.max(1.0, (2024 - yearBuilt) / 80);
-    return squareMeters * baseRate * ageFactor * term;
+// Класс для квартиры
+class Apartment extends Property {
+  constructor(area, residents, yearBuilt) { // [1]
+    super(area, residents, yearBuilt);
   }
 }
 
-class Cottage extends InsuranceType {
-  calculate(squareMeters, yearBuilt, term) {
-    const baseRate = 10.0;
-    const ageFactor = Math.max(1.0, (2024 - yearBuilt) / 50);
-    return squareMeters * baseRate * ageFactor * term;
+// Класс для таунхауса
+class Townhouse extends Property {
+  constructor(area, residents, yearBuilt) { // [1]
+    super(area, residents, yearBuilt);
   }
 }
 
-class InsuranceCalculator {
-  constructor(strategy) {
-    this.strategy = strategy;
-  }
-
-  setStrategy(strategy) {
-    this.strategy = strategy;
-  }
-
-  calculateInsurance(squareMeters, yearBuilt, term) {
-    return this.strategy.calculate(squareMeters, yearBuilt, term);
+// Класс для коттеджа
+class Cottage extends Property {
+  constructor(area, residents, yearBuilt) { // [1]
+    super(area, residents, yearBuilt);
   }
 }
 
-for (let i = 1; i <= 10; i++) {
-  const squareMeters = Math.floor(Math.random() * (300 - 15 + 1)) + 15;
-  const yearBuilt = Math.floor(Math.random() * (2023 - 1900 + 1)) + 1900;
-  const term = Math.floor(Math.random() * (20 - 1 + 1)) + 1;
+// В конец файлsа script.js
+//module.exports = { Apartment, Townhouse, Cottage };
 
-  const strategy = getRandomStrategy();
-  const calculator = new InsuranceCalculator(strategy);
+// Пример использования
+const myApartment = new Apartment(80, 3, 2005);
+const myTownhouse = new Townhouse(120, 4, 1995);
+const myCottage = new Cottage(150, 5, 1985);
 
-  const insuranceCost = calculator.calculateInsurance(squareMeters, yearBuilt, term);
-  console.log(`Вызов ${i}: Недвижимость: ${strategy.constructor.name} Площадь: ${squareMeters}, Год постройки: ${yearBuilt}, Срок: ${term} = ${insuranceCost}`);
-}
-
-function getRandomStrategy() {
-  const strategies = [new Apartment(), new Townhouse(), new Cottage()];
-  const randomIndex = Math.floor(Math.random() * strategies.length);
-  return strategies[randomIndex];
-}
+console.log("Страховой взнос за квартиру: " + myApartment.calculatePremium(2)); // Средний срок
+console.log("Страховой взнос за таунхаус: " + myTownhouse.calculatePremium(4)); // Долгий срок
+console.log("Страховой взнос за коттедж: " + myCottage.calculatePremium(1)); // Краткосрочное
